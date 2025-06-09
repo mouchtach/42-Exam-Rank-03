@@ -23,11 +23,7 @@ char *search_and_replace(char *str, char *find)
         if(str[i] == find[x]) 
         {
             j = i;
-            while(find[x] && str[j] == find[x])
-            {
-                x++;
-                j++;
-            }
+            while(find[x] && str[j++] == find[x++]);
             if(find[x] == 0)
             {
                 while(str[i] && x--)
