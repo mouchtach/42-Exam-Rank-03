@@ -88,8 +88,9 @@ int ft_vfscanf(FILE *f, const char *format, va_list ap)
 
 int ft_scanf(const char *format, ...)
 {
-	// ...
+	va_list ap;
+	va_start(ap, format);
 	int ret = ft_vfscanf(stdin, format, ap);
-	// ...
+	va_end(ap);
 	return ret;
 }
