@@ -1,81 +1,85 @@
+#include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
-// دالة مساعدة لفحص إذا كانت السلسلة من الأقواس صحيحة
-int isValid(char *s) {
-    int balance = 0;
-    for (int i = 0; s[i]; i++) {
-        if (s[i] == '(') {
-            balance++;
-        } else {
-            balance--;
-        }
-        if (balance < 0) {
-            return 0; // غير صحيح
-        }
-    }
-    return (balance == 0); // صحيح فقط إذا كان التوازن صفر
-}
-
-// دالة لعرض جميع الاحتمالات
-void printAllCombinations(char *current, int pos, int n, int open, int close) {
-    // إذا وصلنا إلى طول السلسلة الكامل
-    if (pos == 2 * n) {
-        current[pos] = '\0'; // ننهي السلسلة
-        if (isValid(current)) { // نتحقق إذا كانت التركيبة صحيحة
-            printf("%s\n", current);
-        }
-        return;
-    }
-
-    // إذا كان بإمكاننا إضافة قوس مفتوح '('
-    if (open < n) {
-        current[pos] = '(';
-        printAllCombinations(current, pos + 1, n, open + 1, close);
-    }
-
-    // إذا كان بإمكاننا إضافة قوس مغلق ')'
-    if (close < open) {
-        current[pos] = ')';
-        printAllCombinations(current, pos + 1, n, open, close + 1);
-    }
-}
-
-int main(int argc, char *argv[]) 
+void	min_removals(char *input, size_t inputLen, size_t *rem_l, size_t *rem_r)
 {
-    if (argc != 2) 
-    {
-        printf("الاستخدام: %s \"سلسلة_الأقواس\"\n", argv[0]);
-        return 1;
-    }
-    char *input = argv[1];
-    int open = 0, close = 0;
+	size_t balance = 0;
+	size_t i = 0;
 
-    // نعد عدد الأقواس المفتوحة والمغلقة في المدخل
-    for (int i = 0; input[i]; i++) {
-        if (input[i] == '(') {
-            open++;
-        } else if (input[i] == ')') {
-            close++;
-        } else {
-            printf("خطأ: المدخل يجب أن يحتوي فقط على '(' و ')'\n");
-            return 1;
-        }
-    }
+	while (i < inputLen)
+	{
+		if (input[i] == '(')
+			balance++;
+		else if (input[i] == ')')
+		{
+			if (balance == 0)
+				(*rem_r)++;
+			else
+				balance--;
+		}
+		i++;
+	}
+	*rem_l = balance;
+}
 
-    // نتحقق أن عدد الأقواس متساو
-    if (open != close) {
-        printf("خطأ: عدد الأقواس المفتوحة يجب أن يساوي المغلقة\n");
-        return 1;
-    }
+void	rip(char *input, size_t i, char *result, size_t rm_open, size_t rm_close, int open)
+{
+	// finish
+	if (input[i] == '\0')
+	{
+		if (rm_open == 0 && rm_close == 0 && open == 0)
+		{
+			result[i] = '\0';
+			printf("%s\n", result);
+		}
+		return ;
+	}
+	// not a para
+	if (input[i] != '(' && input[i] != ')')
+	{
+		result[i] = input[i];
+		rip(input, i + 1, result, rm_open, rm_close, open);
+		return ;
+	}
+	// remove
+	if (input[i] == '(' && rm_open > 0)
+	{
+		result[i] = ' ';
+		rip(input, i + 1, result, rm_open - 1, rm_close, open);
+	}
+	if (input[i] == ')' && rm_close > 0)
+	{
+		result[i] = ' ';
+		rip(input, i + 1, result, rm_open, rm_close - 1, open);
+	}
+	// keep
+	if (input[i] == '(')
+	{
+		result[i] = '(';
+		rip(input, i + 1, result, rm_open, rm_close, open + 1);
+	}
+	if (input[i] == ')' && open > 0)
+	{
+		result[i] = ')';
+		rip(input, i + 1, result, rm_open, rm_close, open - 1);
+	}
+}
 
-    int totalPairs = open;
-    char *combination = malloc(2 * totalPairs + 1); // نخصص مكان للسلسلة
+int main(int ac, char *av[])
+{
+	if (ac != 2)
+		return 1;
+	char *input = av[1];
+	size_t inputLen = strlen(input);
+	char result[255] = {0};
+	// char *result = malloc(strlen(input) + 1);
+	size_t rm_open = 0;
+	size_t rm_close = 0;
 
-    printf("جميع الترتيبات الصحيحة الممكنة:\n");
-    printAllCombinations(combination, 0, totalPairs, 0, 0);
+	min_removals(input, inputLen, &rm_open, &rm_close);
 
-    free(combination); // نحرر الذاكرة
-    return 0;
+	rip(input, 0, result, rm_open, rm_close, 0);
+	// free(result);
 }
