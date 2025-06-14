@@ -44,7 +44,7 @@ void findSubsets(int target, int* numbers, int start, int size, int* subset, int
             i++;
         else 
         {
-            if (i > start && numbers[i] == numbers[i-1])
+            if (i > start && numbers[i] == numbers[i - 1])
                 i++; 
             else 
             {

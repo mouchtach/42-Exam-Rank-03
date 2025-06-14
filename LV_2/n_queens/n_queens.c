@@ -1,6 +1,24 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+
+void put_bnr(int nb)
+{
+    char c;
+
+    if(nb >= 10)
+    {
+        put_bnr (nb / 10);
+        c = (nb % 10 ) + '0';
+        write(1, &c, 1);
+    }
+    else
+    {
+        c = nb  + '0';
+        write(1, &c, 1);
+    }
+}
+
 void print_solution(int *positions, int n)
 {
     char c;
@@ -8,11 +26,9 @@ void print_solution(int *positions, int n)
 
 	while(i < n)
 	{
-		c = positions[i] + '0';
-        write(1, &c, 1);
-        if (i < n - 1)
-            write(1, " ", 1);
-		i++;
+        put_bnr(positions[i]);
+        write(1, " ", 1);
+        i++;
 	}
     write(1, "\n", 1);
 }
